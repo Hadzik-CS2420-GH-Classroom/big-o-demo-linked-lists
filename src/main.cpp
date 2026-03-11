@@ -217,7 +217,7 @@ int main() {
 
     // ── push_front: O(1) on both SLL and DLL ────────────────────────────
 
-    print_header("SLL push_front — O(1)");
+    print_header("SLL push_front - O(1)");
     double prev = 0;
     for (int n : sizes) {
         SinglyLinkedList list;
@@ -231,7 +231,7 @@ int main() {
 
     // ── push_back: O(n) on SLL, O(1) on DLL ────────────────────────────
 
-    print_header("SLL push_back — O(n)  [THIS IS THE SLOW ONE]");
+    print_header("SLL push_back - O(n)  [THIS IS THE SLOW ONE]");
     prev = 0;
     for (int n : sizes) {
         SinglyLinkedList list;
@@ -243,7 +243,7 @@ int main() {
         prev = per_op;
     }
 
-    print_header("DLL push_back — O(1)  [SAME OPERATION, DIFFERENT STRUCTURE]");
+    print_header("DLL push_back - O(1)  [SAME OPERATION, DIFFERENT STRUCTURE]");
     prev = 0;
     for (int n : sizes) {
         DoublyLinkedList list;
@@ -257,7 +257,7 @@ int main() {
 
     // ── pop_back: O(n) on SLL, O(1) on DLL ──────────────────────────────
 
-    print_header("SLL pop_back — O(n)");
+    print_header("SLL pop_back - O(n)");
     prev = 0;
     for (int n : sizes) {
         SinglyLinkedList list;
@@ -270,7 +270,7 @@ int main() {
         prev = per_op;
     }
 
-    print_header("DLL pop_back — O(1)");
+    print_header("DLL pop_back - O(1)");
     prev = 0;
     for (int n : sizes) {
         DoublyLinkedList list;
@@ -285,7 +285,7 @@ int main() {
 
     // ── contains: O(n) — searching for a value not in the list ──────────
 
-    print_header("SLL contains (worst case) — O(n)");
+    print_header("SLL contains (worst case) - O(n)");
     prev = 0;
     for (int n : sizes) {
         SinglyLinkedList list;
@@ -312,7 +312,7 @@ int main() {
     std::cout << "  contains       | O(n)   | O(n)   | Must scan the list\n";
     std::cout << "\n";
     std::cout << "  Key takeaway: Big O describes how performance GROWS\n";
-    std::cout << "  as input size increases — not the actual speed.\n";
+    std::cout << "  as input size increases - not the actual speed.\n";
     std::cout << "\n";
     std::cout << "  O(1) = constant: doubling n doesn't change the time\n";
     std::cout << "  O(n) = linear:   doubling n roughly doubles the time\n";
