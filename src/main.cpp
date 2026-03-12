@@ -8,6 +8,7 @@
 // ============================================================================
 
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -202,6 +203,20 @@ void print_row(int n, double time_us, double prev_time_us) {
     std::cout << "\n";
 }
 
+// ── CSV Output ──────────────────────────────────────────────────────────────
+
+struct BenchResult {
+    std::string operation;
+    int n;
+    double time_us;
+};
+
+std::vector<BenchResult> csv_results;
+
+void record(const std::string& op, int n, double t) {
+    csv_results.push_back({op, n, t});
+}
+
 // ── Main ────────────────────────────────────────────────────────────────────
 
 int main() {
@@ -226,6 +241,7 @@ int main() {
         });
         double per_op = t / n;
         print_row(n, per_op, prev);
+        record("SLL push_front", n, per_op);
         prev = per_op;
     }
 
@@ -240,6 +256,7 @@ int main() {
         });
         double per_op = t / n;
         print_row(n, per_op, prev);
+        record("SLL push_back", n, per_op);
         prev = per_op;
     }
 
@@ -252,6 +269,7 @@ int main() {
         });
         double per_op = t / n;
         print_row(n, per_op, prev);
+        record("DLL push_back", n, per_op);
         prev = per_op;
     }
 
@@ -267,6 +285,7 @@ int main() {
         });
         double per_op = t / n;
         print_row(n, per_op, prev);
+        record("SLL pop_back", n, per_op);
         prev = per_op;
     }
 
@@ -280,6 +299,7 @@ int main() {
         });
         double per_op = t / n;
         print_row(n, per_op, prev);
+        record("DLL pop_back", n, per_op);
         prev = per_op;
     }
 
@@ -294,6 +314,7 @@ int main() {
             list.contains(-1);  // not in the list — must scan all n nodes
         });
         print_row(n, t, prev);
+        record("SLL contains", n, t);
         prev = t;
     }
 
@@ -316,6 +337,16 @@ int main() {
     std::cout << "\n";
     std::cout << "  O(1) = constant: doubling n doesn't change the time\n";
     std::cout << "  O(n) = linear:   doubling n roughly doubles the time\n";
+
+    // ── Write CSV for graph.py ───────────────────────────────────────────
+
+    std::ofstream csv("results.csv");
+    csv << "operation,n,time_us\n";
+    for (auto& r : csv_results) {
+        csv << r.operation << "," << r.n << "," << std::fixed << std::setprecision(4) << r.time_us << "\n";
+    }
+    csv.close();
+    std::cout << "\n  Results written to results.csv — run graph.py to visualize.\n\n";
 
     return 0;
 }
