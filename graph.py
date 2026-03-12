@@ -5,8 +5,8 @@ Usage:
   1. Build and run the C++ program first (it writes results.csv)
   2. Run: python graph.py
 
-Requires: matplotlib
-  pip install matplotlib
+Requires: plotly
+  pip install plotly
 """
 
 import csv
@@ -14,13 +14,12 @@ import sys
 from collections import defaultdict
 
 try:
-    import matplotlib.pyplot as plt
-    import matplotlib.ticker as ticker
+    import plotly.graph_objects as go
 except ImportError:
-    print("matplotlib not found. Install it with: pip install matplotlib")
+    print("plotly not found. Install it with: pip install plotly")
     sys.exit(1)
 
-# ── Load results.csv ────────────────────────────────────────────────────────
+# ── Load results.csv ─────────────────────────────────────────────────────────
 
 data = defaultdict(lambda: {"n": [], "time": []})
 
@@ -35,49 +34,55 @@ except FileNotFoundError:
     print("results.csv not found. Build and run the C++ program first.")
     sys.exit(1)
 
-# ── Plot ─────────────────────────────────────────────────────────────────────
+# ── Plot ──────────────────────────────────────────────────────────────────────
 
-O1_COLOR = "#4CAF50"   # green  — constant time
-ON_COLOR = "#F44336"   # red    — linear time
+O1_COLOR = "#4CAF50"   # green - constant time
+ON_COLOR = "#F44336"   # red   - linear time
 
 O1_OPS = {"SLL push_front", "DLL push_back", "DLL pop_back"}
 
-fig, ax = plt.subplots(figsize=(10, 6))
-
+traces = []
 for op, values in data.items():
-    color = O1_COLOR if op in O1_OPS else ON_COLOR
-    linestyle = "-" if op in O1_OPS else "--"
-    ax.plot(values["n"], values["time"], marker="o", label=op,
-            color=color, linestyle=linestyle, linewidth=2, markersize=6)
+    is_o1 = op in O1_OPS
+    traces.append(go.Scatter(
+        x=values["n"],
+        y=values["time"],
+        mode="lines+markers",
+        name=op,
+        line=dict(
+            color=O1_COLOR if is_o1 else ON_COLOR,
+            dash="solid" if is_o1 else "dash",
+            width=2,
+        ),
+        marker=dict(size=6),
+        hovertemplate="<b>%{fullData.name}</b><br>n = %{x:,}<br>time = %{y:.4f} µs<extra></extra>",
+    ))
 
-# ── Styling ──────────────────────────────────────────────────────────────────
+fig = go.Figure(traces)
 
-ax.set_title("Linked List Operations: O(1) vs O(n)", fontsize=15, fontweight="bold", pad=15)
-ax.set_xlabel("Input Size (n)", fontsize=12)
-ax.set_ylabel("Time per Operation (microseconds)", fontsize=12)
+fig.update_layout(
+    title=dict(text="Linked List Operations: O(1) vs O(n)", font=dict(size=18)),
+    xaxis=dict(
+        title="Input Size (n)",
+        tickformat=",",
+        rangemode="tozero",
+    ),
+    yaxis=dict(
+        title="Time per Operation (microseconds)",
+        tickformat=".4f",
+        rangemode="tozero",
+    ),
+    legend=dict(
+        title="Operation (green = O(1), red = O(n))",
+        font=dict(size=11),
+    ),
+    hovermode="x unified",
+    template="plotly_dark",
+    width=1000,
+    height=600,
+)
 
-ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{int(x):,}"))
-ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, _: f"{y:.3f}"))
-
-ax.grid(True, linestyle="--", alpha=0.4)
-ax.set_xlim(left=0)
-ax.set_ylim(bottom=0)
-
-# Legend with O-class labels
-from matplotlib.lines import Line2D
-legend_handles = [
-    Line2D([0], [0], color=O1_COLOR, linewidth=2, linestyle="-",  label="O(1) — constant time"),
-    Line2D([0], [0], color=ON_COLOR,  linewidth=2, linestyle="--", label="O(n) — linear time"),
-]
-for op, values in data.items():
-    color = O1_COLOR if op in O1_OPS else ON_COLOR
-    ls = "-" if op in O1_OPS else "--"
-    legend_handles.append(Line2D([0], [0], color=color, linewidth=1.5, linestyle=ls,
-                                  marker="o", markersize=5, label=f"  {op}"))
-
-ax.legend(handles=legend_handles, fontsize=9, loc="upper left")
-
-plt.tight_layout()
-plt.savefig("results.png", dpi=150)
-print("Graph saved to results.png")
-plt.show()
+output = "results.html"
+fig.write_html(output, include_plotlyjs="cdn")
+print(f"Graph saved to {output} — open it in a browser.")
+fig.show()
