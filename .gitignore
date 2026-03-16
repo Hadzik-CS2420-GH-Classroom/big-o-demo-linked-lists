@@ -21,5 +21,9 @@ Thumbs.db
 *.exe
 *.out
 
+# Generated output
+results.csv
+charts.html
+
 # Claude temp files
 tmpclaude*
