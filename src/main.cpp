@@ -485,7 +485,7 @@ int main() {
             << r.time_us << "\n";
     }
     csv.close();
-    std::cout << "\n  Results written to CSV — generating charts...\n";
+    std::cout << "\n  Results written to CSV -- generating charts...\n";
 
     std::string cmd = "py -3 \"" + repo_dir + "/graph.py\" --graph-only";
     std::system(cmd.c_str());
