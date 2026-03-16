@@ -12,6 +12,8 @@
 #include <iomanip>
 #include <vector>
 #include <string>
+#include <fstream>
+#include <cstdlib>
 
 // ── Simple Node ─────────────────────────────────────────────────────────────
 
@@ -202,6 +204,16 @@ void print_row(int n, double time_us, double prev_time_us) {
     std::cout << "\n";
 }
 
+// ── Benchmark Result (for CSV export) ────────────────────────────────────────
+
+struct BenchResult {
+    std::string operation;
+    std::string structure;
+    std::string complexity;
+    int n;
+    double time_us;
+};
+
 // ── Main ────────────────────────────────────────────────────────────────────
 
 int main() {
@@ -214,6 +226,7 @@ int main() {
     std::cout << "  - O(n) operations: growth matches the size multiplier\n";
 
     std::vector<int> sizes = {1000, 5000, 10000, 50000};
+    std::vector<BenchResult> results;
 
     // ── push_front: O(1) on both SLL and DLL ────────────────────────────
 
@@ -226,6 +239,7 @@ int main() {
         });
         double per_op = t / n;
         print_row(n, per_op, prev);
+        results.push_back({"push_front", "SLL", "O(1)", n, per_op});
         prev = per_op;
     }
 
@@ -240,6 +254,7 @@ int main() {
         });
         double per_op = t / n;
         print_row(n, per_op, prev);
+        results.push_back({"push_back", "SLL", "O(n)", n, per_op});
         prev = per_op;
     }
 
@@ -252,6 +267,7 @@ int main() {
         });
         double per_op = t / n;
         print_row(n, per_op, prev);
+        results.push_back({"push_back", "DLL", "O(1)", n, per_op});
         prev = per_op;
     }
 
@@ -267,6 +283,7 @@ int main() {
         });
         double per_op = t / n;
         print_row(n, per_op, prev);
+        results.push_back({"pop_back", "SLL", "O(n)", n, per_op});
         prev = per_op;
     }
 
@@ -280,6 +297,7 @@ int main() {
         });
         double per_op = t / n;
         print_row(n, per_op, prev);
+        results.push_back({"pop_back", "DLL", "O(1)", n, per_op});
         prev = per_op;
     }
 
@@ -294,6 +312,7 @@ int main() {
             list.contains(-1);  // not in the list — must scan all n nodes
         });
         print_row(n, t, prev);
+        results.push_back({"contains", "SLL", "O(n)", n, t});
         prev = t;
     }
 
@@ -316,6 +335,22 @@ int main() {
     std::cout << "\n";
     std::cout << "  O(1) = constant: doubling n doesn't change the time\n";
     std::cout << "  O(n) = linear:   doubling n roughly doubles the time\n";
+
+    // ── Write CSV and generate charts ──────────────────────────────────
+    std::string repo_dir = REPO_DIR;
+    std::string csv_path = repo_dir + "/results.csv";
+    std::ofstream csv(csv_path);
+    csv << "operation,structure,complexity,n,time_us\n";
+    for (const auto& r : results) {
+        csv << r.operation << "," << r.structure << "," << r.complexity
+            << "," << r.n << "," << std::fixed << std::setprecision(4)
+            << r.time_us << "\n";
+    }
+    csv.close();
+    std::cout << "\n  Results written to CSV — generating charts...\n";
+
+    std::string cmd = "py -3 \"" + repo_dir + "/graph.py\" --graph-only";
+    std::system(cmd.c_str());
 
     return 0;
 }
