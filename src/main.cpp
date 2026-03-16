@@ -97,6 +97,31 @@ public:
         return false;
     }
 
+    // O(n) — must find the node, then remove it (trailing pointer)
+    bool remove(int value) {
+        if (!head_) return false;
+        if (head_->data == value) {
+            Node* temp = head_;
+            head_ = head_->next;
+            delete temp;
+            size_--;
+            return true;
+        }
+        Node* previous = head_;
+        Node* current = head_->next;
+        while (current) {
+            if (current->data == value) {
+                previous->next = current->next;
+                delete current;
+                size_--;
+                return true;
+            }
+            previous = current;
+            current = current->next;
+        }
+        return false;
+    }
+
     int get_size() const { return size_; }
 
 private:
@@ -164,6 +189,34 @@ public:
         else head_ = nullptr;
         delete temp;
         size_--;
+    }
+
+    // O(n) — must scan up to every node
+    bool contains(int value) const {
+        DoublyNode* current = head_;
+        while (current) {
+            if (current->data == value) return true;
+            current = current->next;
+        }
+        return false;
+    }
+
+    // O(n) — must find the node, then relink prev/next
+    bool remove(int value) {
+        DoublyNode* current = head_;
+        while (current) {
+            if (current->data == value) {
+                if (current->prev) current->prev->next = current->next;
+                else head_ = current->next;
+                if (current->next) current->next->prev = current->prev;
+                else tail_ = current->prev;
+                delete current;
+                size_--;
+                return true;
+            }
+            current = current->next;
+        }
+        return false;
     }
 
     int get_size() const { return size_; }
@@ -243,6 +296,19 @@ int main() {
         prev = per_op;
     }
 
+    print_header("DLL push_front - O(1)");
+    prev = 0;
+    for (int n : sizes) {
+        DoublyLinkedList list;
+        double t = time_us([&]() {
+            for (int i = 0; i < n; i++) list.push_front(i);
+        });
+        double per_op = t / n;
+        print_row(n, per_op, prev);
+        results.push_back({"push_front", "DLL", "O(1)", n, per_op});
+        prev = per_op;
+    }
+
     // ── push_back: O(n) on SLL, O(1) on DLL ────────────────────────────
 
     print_header("SLL push_back - O(n)  [THIS IS THE SLOW ONE]");
@@ -268,6 +334,36 @@ int main() {
         double per_op = t / n;
         print_row(n, per_op, prev);
         results.push_back({"push_back", "DLL", "O(1)", n, per_op});
+        prev = per_op;
+    }
+
+    // ── pop_front: O(1) on both SLL and DLL ─────────────────────────────
+
+    print_header("SLL pop_front - O(1)");
+    prev = 0;
+    for (int n : sizes) {
+        SinglyLinkedList list;
+        for (int i = 0; i < n; i++) list.push_front(i);
+        double t = time_us([&]() {
+            for (int i = 0; i < n; i++) list.pop_front();
+        });
+        double per_op = t / n;
+        print_row(n, per_op, prev);
+        results.push_back({"pop_front", "SLL", "O(1)", n, per_op});
+        prev = per_op;
+    }
+
+    print_header("DLL pop_front - O(1)");
+    prev = 0;
+    for (int n : sizes) {
+        DoublyLinkedList list;
+        for (int i = 0; i < n; i++) list.push_front(i);
+        double t = time_us([&]() {
+            for (int i = 0; i < n; i++) list.pop_front();
+        });
+        double per_op = t / n;
+        print_row(n, per_op, prev);
+        results.push_back({"pop_front", "DLL", "O(1)", n, per_op});
         prev = per_op;
     }
 
@@ -316,6 +412,47 @@ int main() {
         prev = t;
     }
 
+    print_header("DLL contains (worst case) - O(n)");
+    prev = 0;
+    for (int n : sizes) {
+        DoublyLinkedList list;
+        for (int i = 0; i < n; i++) list.push_front(i);
+        double t = time_us([&]() {
+            list.contains(-1);  // not in the list — must scan all n nodes
+        });
+        print_row(n, t, prev);
+        results.push_back({"contains", "DLL", "O(n)", n, t});
+        prev = t;
+    }
+
+    // ── remove: O(n) — must find the node first ──────────────────────────
+
+    print_header("SLL remove (worst case) - O(n)");
+    prev = 0;
+    for (int n : sizes) {
+        SinglyLinkedList list;
+        for (int i = 0; i < n; i++) list.push_front(i);
+        double t = time_us([&]() {
+            list.remove(-1);  // not in the list — must scan all n nodes
+        });
+        print_row(n, t, prev);
+        results.push_back({"remove", "SLL", "O(n)", n, t});
+        prev = t;
+    }
+
+    print_header("DLL remove (worst case) - O(n)");
+    prev = 0;
+    for (int n : sizes) {
+        DoublyLinkedList list;
+        for (int i = 0; i < n; i++) list.push_front(i);
+        double t = time_us([&]() {
+            list.remove(-1);  // not in the list — must scan all n nodes
+        });
+        print_row(n, t, prev);
+        results.push_back({"remove", "DLL", "O(n)", n, t});
+        prev = t;
+    }
+
     // ── Summary ─────────────────────────────────────────────────────────
 
     std::cout << "\n============================================================\n";
@@ -329,6 +466,7 @@ int main() {
     std::cout << "  pop_front      | O(1)   | O(1)   | Direct pointer update\n";
     std::cout << "  pop_back       | O(n)   | O(1)   | SLL walks; DLL has prev_\n";
     std::cout << "  contains       | O(n)   | O(n)   | Must scan the list\n";
+    std::cout << "  remove         | O(n)   | O(n)   | Must find the node first\n";
     std::cout << "\n";
     std::cout << "  Key takeaway: Big O describes how performance GROWS\n";
     std::cout << "  as input size increases - not the actual speed.\n";

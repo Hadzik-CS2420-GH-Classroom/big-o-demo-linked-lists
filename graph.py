@@ -85,8 +85,8 @@ def group_by_operation(rows):
 # ── Chart Generation ──────────────────────────────────────────────────────────
 
 COLORS = {
-    "SLL": "#ef4444",  # red
-    "DLL": "#22c55e",  # green
+    "SLL": "#dc2626",  # red
+    "DLL": "#16a34a",  # green
 }
 
 
@@ -107,7 +107,8 @@ def build_chart(op_name, structures):
         title=dict(text=op_name, font=dict(size=22)),
         xaxis_title="n (input size)",
         yaxis_title="Time per operation (\u00b5s)",
-        template="plotly_dark",
+        yaxis=dict(rangemode="tozero"),
+        template="plotly_white",
         font=dict(size=14),
         legend=dict(font=dict(size=14)),
         margin=dict(t=60, b=60),
@@ -130,10 +131,10 @@ def generate_html(operations):
 <meta charset="utf-8">
 <title>Big O Demo: Linked Lists</title>
 <style>
-  body {{ background: #1e1e2e; color: #cdd6f4; font-family: system-ui, sans-serif;
+  body {{ background: #ffffff; color: #1a1a1a; font-family: system-ui, sans-serif;
          max-width: 960px; margin: 0 auto; padding: 2rem; }}
   h1 {{ text-align: center; margin-bottom: 0.25rem; }}
-  p.sub {{ text-align: center; color: #a6adc8; margin-top: 0; }}
+  p.sub {{ text-align: center; color: #666; margin-top: 0; }}
   .chart {{ margin-bottom: 2rem; }}
 </style>
 </head>
