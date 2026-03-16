@@ -1,4 +1,25 @@
+# Build directories
 build/
+cmake-build-*/
 out/
-results.csv
-charts.html
+
+# IDE files
+.idea/
+.vs/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Compiled objects
+*.o
+*.obj
+*.exe
+*.out
+
+# Claude temp files
+tmpclaude*
