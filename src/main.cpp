@@ -278,7 +278,7 @@ int main() {
     std::cout << "  - O(1) operations: growth stays near 1x (constant)\n";
     std::cout << "  - O(n) operations: growth matches the size multiplier\n";
 
-    std::vector<int> sizes = {1000, 5000, 10000, 50000};
+    std::vector<int> sizes = {1000, 2000, 5000, 10000};
     std::vector<BenchResult> results;
 
     // ── push_front: O(1) on both SLL and DLL ────────────────────────────
